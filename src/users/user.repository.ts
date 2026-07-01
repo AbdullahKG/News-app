@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
+import { Users } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { GetUsersDto } from './dto/get-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -15,14 +15,14 @@ import { Bcrypt } from 'src/common/classes/bcrypt.class';
 @Injectable()
 export class UsersRepository {
   constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(Users) private readonly userRepository: Repository<Users>,
     private readonly bcrypt: Bcrypt,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async create(createUserDto: CreateUserDto): Promise<Users> {
     const { username, password, role, email } = createUserDto;
 
-    const newUser = new User();
+    const newUser = new Users();
 
     newUser.username = username;
     newUser.password = await this.bcrypt.hashUserPassword(password);
@@ -39,7 +39,9 @@ export class UsersRepository {
     }
   }
 
-  async findAll(query: GetUsersDto): Promise<{ users: User[]; total: number }> {
+  async findAll(
+    query: GetUsersDto,
+  ): Promise<{ users: Users[]; total: number }> {
     const { limit, offset, search } = query;
 
     const [users, total] = await this.userRepository.findAndCount({
@@ -51,7 +53,7 @@ export class UsersRepository {
     return { users, total };
   }
 
-  async findOne(id: string, query: GetUsersDto): Promise<User> {
+  async findOne(id: string, query: GetUsersDto): Promise<Users> {
     const foundUser = await this.userRepository.findOne({ where: { id } });
 
     if (!foundUser) throw new NotFoundException('no user found');
@@ -59,7 +61,7 @@ export class UsersRepository {
     return foundUser;
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<Users> {
     const foundUser = await this.findOne(id, {});
 
     const { username, password, role, email } = updateUserDto;

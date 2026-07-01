@@ -11,16 +11,22 @@ export abstract class CoreEntity {
 
   @CreateDateColumn({
     type: 'timestamp with time zone',
+    length: 0,
     default: () => 'now()',
   })
   createdAt: Date;
 
   @UpdateDateColumn({
     type: 'timestamp with time zone',
+    length: 0,
     default: () => 'now()',
   })
   updatedAt: Date;
 
-  @DeleteDateColumn({ type: 'timestamp with time zone', nullable: true })
+  @DeleteDateColumn({
+    type: 'timestamp with time zone',
+    length: 0,
+    nullable: true,
+  })
   deletedAt: Date;
 }

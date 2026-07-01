@@ -14,7 +14,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { GetUsersDto } from './dto/get-user.dto';
-import { User } from './entities/user.entity';
+import { Users } from './entities/user.entity';
 import { DeleteResult } from 'typeorm';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
 import { RolesGuard } from 'src/auth/guard/roles.guard';
@@ -28,14 +28,14 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto): Promise<User> {
+  create(@Body() createUserDto: CreateUserDto): Promise<Users> {
     return this.usersService.create(createUserDto);
   }
 
   @Get()
   findAll(
     @Query() query: GetUsersDto,
-  ): Promise<{ users: User[]; total: number }> {
+  ): Promise<{ users: Users[]; total: number }> {
     return this.usersService.findAll(query);
   }
 
@@ -43,7 +43,7 @@ export class UsersController {
   findOne(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Query() query: GetUsersDto,
-  ): Promise<User> {
+  ): Promise<Users> {
     return this.usersService.findOne(id, query);
   }
 
@@ -51,7 +51,7 @@ export class UsersController {
   update(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateUserDto: UpdateUserDto,
-  ): Promise<User> {
+  ): Promise<Users> {
     return this.usersService.update(id, updateUserDto);
   }
 

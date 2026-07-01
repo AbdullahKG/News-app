@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Category } from './entities/category.entity';
+import { Categories } from './entities/category.entity';
 import { ILike, Repository, DeleteResult } from 'typeorm';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { GetCategoryDto } from './dto/get-category.dto';
@@ -14,14 +14,14 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 @Injectable()
 export class CategoriesRepository {
   constructor(
-    @InjectRepository(Category)
-    private readonly categoryRepository: Repository<Category>,
+    @InjectRepository(Categories)
+    private readonly categoryRepository: Repository<Categories>,
   ) {}
 
-  async create(createCategoryDto: CreateCategoryDto): Promise<Category> {
+  async create(createCategoryDto: CreateCategoryDto): Promise<Categories> {
     const { categoryName } = createCategoryDto;
 
-    const newCategory = new Category();
+    const newCategory = new Categories();
     newCategory.categoryName = categoryName;
 
     try {
@@ -36,7 +36,7 @@ export class CategoriesRepository {
 
   async findAll(
     query: GetCategoryDto,
-  ): Promise<{ categories: Category[]; total: number }> {
+  ): Promise<{ categories: Categories[]; total: number }> {
     const { search, limit, offset } = query;
 
     const [categories, total] = await this.categoryRepository.findAndCount({
@@ -48,7 +48,7 @@ export class CategoriesRepository {
     return { categories, total };
   }
 
-  async findOne(id: string): Promise<Category> {
+  async findOne(id: string): Promise<Categories> {
     const category = await this.categoryRepository.findOne({
       where: { id },
     });
@@ -63,7 +63,7 @@ export class CategoriesRepository {
   async update(
     id: string,
     updateCategoryDto: UpdateCategoryDto,
-  ): Promise<Category> {
+  ): Promise<Categories> {
     const foundCategory = await this.findOne(id);
 
     const { categoryName } = updateCategoryDto;
