@@ -9,12 +9,16 @@ import { Newsletters } from './entities/newsletter.entity';
 import { CreateNewsletterDto } from './dto/create-newsletter.dto';
 import { GetNewsletterDto } from './dto/get-newsletter.dto';
 import { UpdateNewsletterDto } from './dto/update-newsletter.dto';
+import { RedisService } from 'src/redis/redis.service';
+import { Categories } from 'src/categories/entities/category.entity';
+import { Users } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class NewslettersRepository {
   constructor(
     @InjectRepository(Newsletters)
     private readonly newslettersRepository: Repository<Newsletters>,
+    private readonly redisService: RedisService,
   ) {}
 
   async create(
@@ -24,25 +28,42 @@ export class NewslettersRepository {
     const { title, content, cover_image, categoryId } = createNewsletterDto;
 
     const newNewsLetter = new Newsletters();
+    const category = new Categories();
+    const userEntity = new Users();
+
+    category.id = categoryId;
+    userEntity.id = user.id;
     newNewsLetter.title = title;
     newNewsLetter.body = content;
     newNewsLetter.cover_image = cover_image;
-    newNewsLetter.category.id = categoryId;
-    newNewsLetter.author.id = user.id;
+    newNewsLetter.category = category;
+    newNewsLetter.author = userEntity;
 
+    let savedNewsletter: Newsletters;
     try {
-      return await this.newslettersRepository.save(newNewsLetter);
+      savedNewsletter = await this.newslettersRepository.save(newNewsLetter);
     } catch (error) {
       if (error.code === '23503') {
       }
       throw new InternalServerErrorException(error.message);
     }
+
+    await this.invalidateNewslettersCache();
+    return savedNewsletter;
   }
 
   async findAll(
     query: GetNewsletterDto,
   ): Promise<{ newsLetters: Newsletters[]; total: number }> {
+    const redis = this.redisService.getClient();
     const { search, limit, offset } = query;
+
+    const cacheKey = `newsletters:${search || 'all'}:${limit || 100}:${offset || 0}`;
+    const cachedData = await redis.get(cacheKey);
+
+    if (cachedData) {
+      return JSON.parse(cachedData);
+    }
 
     const queryBuilder = this.newslettersRepository
       .createQueryBuilder('newsLetter')
@@ -50,7 +71,7 @@ export class NewslettersRepository {
       .leftJoinAndSelect('newsLetter.author', 'user');
 
     if (search) {
-      queryBuilder.andWhere('category.name ILIKE :search', {
+      queryBuilder.andWhere('newsLetter.title ILIKE :search', {
         search: `%${search}%`,
       });
     }
@@ -59,6 +80,14 @@ export class NewslettersRepository {
       .skip(offset ?? 0)
       .limit(limit ?? 100)
       .getManyAndCount();
+
+    await redis.set(
+      cacheKey,
+      JSON.stringify({ newsLetters, total }),
+      'EX',
+      300,
+    ); // 5 minutes cache expiration
+    await redis.sadd('newsletters:cache-keys', cacheKey);
 
     return { newsLetters, total };
   }
@@ -88,11 +117,15 @@ export class NewslettersRepository {
     foundNewsLetter.cover_image = cover_image ?? foundNewsLetter.cover_image;
     foundNewsLetter.category.id = categoryId ?? foundNewsLetter.category.id;
 
+    let updatedNewsletter: Newsletters;
     try {
-      return await this.newslettersRepository.save(foundNewsLetter);
+      updatedNewsletter =
+        await this.newslettersRepository.save(foundNewsLetter);
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
+    await this.invalidateNewslettersCache();
+    return updatedNewsletter;
   }
 
   async delete(id: string): Promise<DeleteResult> {
@@ -101,7 +134,16 @@ export class NewslettersRepository {
     if (deleted.affected === 0) {
       throw new NotFoundException(`Newsletter with ID ${id} not found`);
     }
-
+    await this.invalidateNewslettersCache();
     return deleted;
+  }
+
+  private async invalidateNewslettersCache() {
+    const redis = this.redisService.getClient();
+    const keys = await redis.smembers('newsletters:cache-keys');
+    if (keys.length) {
+      await redis.del(...keys);
+    }
+    await redis.del('newsletters:cache-keys');
   }
 }
