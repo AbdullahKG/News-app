@@ -1,26 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { CreateNotificationDto } from './dto/create-notification.dto';
-import { UpdateNotificationDto } from './dto/update-notification.dto';
+import { NotificationsRepository } from './notifications.repository';
 
 @Injectable()
 export class NotificationsService {
+  constructor(
+    private readonly notificationsRepository: NotificationsRepository,
+  ) {}
+
   create(createNotificationDto: CreateNotificationDto) {
-    return 'This action adds a new notification';
+    return this.notificationsRepository.create(createNotificationDto);
   }
 
-  findAll() {
-    return `This action returns all notifications`;
+  findAll(user: any) {
+    return this.notificationsRepository.findAll(user);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} notification`;
-  }
-
-  update(id: number, updateNotificationDto: UpdateNotificationDto) {
-    return `This action updates a #${id} notification`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} notification`;
+  update(id: string, user: any) {
+    return this.notificationsRepository.update(id, user);
   }
 }
