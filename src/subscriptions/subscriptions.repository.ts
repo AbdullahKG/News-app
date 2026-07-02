@@ -2,7 +2,6 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
-  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Subscriptions } from './entities/subscription.entity';
@@ -49,7 +48,7 @@ export class SubscriptionsRepository {
     const queryBuilder = this.subscriptionsRepository
       .createQueryBuilder('subscription')
       .leftJoinAndSelect('subscription.category', 'category')
-      .where('subscription.userId = :userId', { userId: user.id });
+      .where('subscription.user = :userId', { userId: user.id });
 
     if (search) {
       queryBuilder.andWhere('category.name ILIKE :search', {
