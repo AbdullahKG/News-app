@@ -8,6 +8,8 @@ import { Notifications } from './entities/notification.entity';
 import { Repository, UpdateResult } from 'typeorm';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
+import { Newsletters } from 'src/newsletters/entities/newsletter.entity';
+import { Users } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class NotificationsRepository {
@@ -22,9 +24,14 @@ export class NotificationsRepository {
     const { userId, newsletterId } = createNotificationDto;
 
     const newNotification = new Notifications();
+    const newsLetter = new Newsletters();
+    const user = new Users();
 
-    newNotification.user.id = userId;
-    newNotification.newsletter.id = newsletterId;
+    user.id = userId;
+    newsLetter.id = newsletterId;
+
+    newNotification.user = user;
+    newNotification.newsletter = newsLetter;
 
     try {
       return await this.notificationsRepository.save(newNotification);

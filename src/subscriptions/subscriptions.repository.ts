@@ -9,6 +9,8 @@ import { Repository } from 'typeorm';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { GetSubscriptionDto } from './dto/get-subscription.dto';
 import { DeleteResult } from 'typeorm/browser';
+import { Categories } from 'src/categories/entities/category.entity';
+import { Users } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class SubscriptionsRepository {
@@ -24,8 +26,13 @@ export class SubscriptionsRepository {
     const { categoryId } = subscription;
 
     const newSubscription = new Subscriptions();
-    newSubscription.category.id = categoryId;
-    newSubscription.user.id = user.id;
+    const category = new Categories();
+    const userEntity = new Users();
+
+    category.id = categoryId;
+    userEntity.id = user.id;
+    newSubscription.category = category;
+    newSubscription.user = userEntity;
 
     try {
       return await this.subscriptionsRepository.save(newSubscription);
