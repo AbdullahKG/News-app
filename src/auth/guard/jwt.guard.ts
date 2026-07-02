@@ -25,7 +25,7 @@ export class JwtGuard implements CanActivate {
       });
 
       request.user = {
-        userId: payload.sub,
+        id: payload.sub,
         role: payload.role,
         email: payload.email,
         iat: payload.iat,

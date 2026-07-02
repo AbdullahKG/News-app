@@ -55,6 +55,7 @@ export class SubscriptionsRepository {
     const queryBuilder = this.subscriptionsRepository
       .createQueryBuilder('subscription')
       .leftJoinAndSelect('subscription.category', 'category')
+      .leftJoinAndSelect('subscription.user', 'user')
       .where('subscription.user = :userId', { userId: user.id });
 
     if (search) {
