@@ -9,13 +9,19 @@ import {
   Query,
   ParseUUIDPipe,
   Req,
+  UseGuards,
 } from '@nestjs/common';
 import { SubscriptionsService } from './subscriptions.service';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
-import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
 import { GetSubscriptionDto } from './dto/get-subscription.dto';
+import { JwtGuard } from 'src/auth/guard/jwt.guard';
+import { RolesGuard } from 'src/auth/guard/roles.guard';
+import { UserRoleEnum } from 'src/users/enums/user-roles.enum';
+import { Roles } from 'src/auth/decorators/role.decorator';
 
 @Controller('subscriptions')
+@UseGuards(JwtGuard, RolesGuard)
+@Roles(UserRoleEnum.ADMIN, UserRoleEnum.AUTHOR, UserRoleEnum.USER)
 export class SubscriptionsController {
   constructor(private readonly subscriptionsService: SubscriptionsService) {}
 

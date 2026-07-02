@@ -8,13 +8,20 @@ import {
   Delete,
   Query,
   ParseUUIDPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { GetCategoryDto } from './dto/get-category.dto';
+import { Roles } from 'src/auth/decorators/role.decorator';
+import { JwtGuard } from 'src/auth/guard/jwt.guard';
+import { RolesGuard } from 'src/auth/guard/roles.guard';
+import { UserRoleEnum } from 'src/users/enums/user-roles.enum';
 
 @Controller('categories')
+@UseGuards(JwtGuard, RolesGuard)
+@Roles(UserRoleEnum.ADMIN)
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
