@@ -1,4 +1,5 @@
 import { CoreEntity } from 'src/common/entities/core.entity';
+import { Newsletters } from 'src/newsletters/entities/newsletter.entity';
 import { Subscriptions } from 'src/subscriptions/entities/subscription.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 
@@ -18,4 +19,7 @@ export class Users extends CoreEntity {
 
   @OneToMany(() => Subscriptions, (subscription) => subscription.user)
   subscriptions: Subscriptions[];
+
+  @OneToMany(() => Newsletters, (newsletter) => newsletter.author)
+  newsletters: Newsletters[];
 }

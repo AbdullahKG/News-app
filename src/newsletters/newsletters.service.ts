@@ -1,26 +1,29 @@
 import { Injectable } from '@nestjs/common';
 import { CreateNewsletterDto } from './dto/create-newsletter.dto';
 import { UpdateNewsletterDto } from './dto/update-newsletter.dto';
+import { NewslettersRepository } from './newsletters.repository';
+import { GetNewsletterDto } from './dto/get-newsletter.dto';
 
 @Injectable()
 export class NewslettersService {
-  create(createNewsletterDto: CreateNewsletterDto) {
-    return 'This action adds a new newsletter';
+  constructor(private readonly newsLettersRepository: NewslettersRepository) {}
+  create(createNewsletterDto: CreateNewsletterDto, user: any) {
+    return this.newsLettersRepository.create(createNewsletterDto, user);
   }
 
-  findAll() {
-    return `This action returns all newsletters`;
+  findAll(query: GetNewsletterDto) {
+    return this.newsLettersRepository.findAll(query);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} newsletter`;
+  findOne(id: string) {
+    return this.newsLettersRepository.findById(id);
   }
 
-  update(id: number, updateNewsletterDto: UpdateNewsletterDto) {
-    return `This action updates a #${id} newsletter`;
+  update(id: string, updateNewsletterDto: UpdateNewsletterDto) {
+    return this.newsLettersRepository.update(id, updateNewsletterDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} newsletter`;
+  remove(id: string) {
+    return this.newsLettersRepository.delete(id);
   }
 }
