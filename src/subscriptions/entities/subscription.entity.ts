@@ -1,4 +1,3 @@
-import { Categories } from 'src/categories/entities/category.entity';
 import { Users } from 'src/users/entities/user.entity';
 import {
   CreateDateColumn,
@@ -20,11 +19,11 @@ export class Subscriptions {
   })
   createdAt: Date;
 
-  @ManyToOne(() => Users, (user) => user.subscriptions)
-  @JoinColumn({ name: 'user_id' })
-  user: Users;
+  @ManyToOne(() => Users, (user) => user.followedAuthors)
+  @JoinColumn({ name: 'subscriber_id' })
+  subscriber: Users;
 
-  @ManyToOne(() => Categories, (category) => category.subscriptions)
-  @JoinColumn({ name: 'category_id' })
-  category: Categories;
+  @ManyToOne(() => Users, (user) => user.followers)
+  @JoinColumn({ name: 'author_id' })
+  author: Users;
 }

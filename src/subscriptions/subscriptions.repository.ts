@@ -23,16 +23,16 @@ export class SubscriptionsRepository {
     subscription: CreateSubscriptionDto,
     user: any,
   ): Promise<Subscriptions> {
-    const { categoryId } = subscription;
+    const { authorId } = subscription;
 
     const newSubscription = new Subscriptions();
-    const category = new Categories();
-    const userEntity = new Users();
+    const subscriber = new Users();
+    const author = new Users();
 
-    category.id = categoryId;
-    userEntity.id = user.id;
-    newSubscription.category = category;
-    newSubscription.user = userEntity;
+    subscriber.id = user.id;
+    author.id = authorId;
+    newSubscription.subscriber = subscriber;
+    newSubscription.author = author;
 
     try {
       return await this.subscriptionsRepository.save(newSubscription);
@@ -54,12 +54,13 @@ export class SubscriptionsRepository {
 
     const queryBuilder = this.subscriptionsRepository
       .createQueryBuilder('subscription')
-      .leftJoinAndSelect('subscription.category', 'category')
-      .leftJoinAndSelect('subscription.user', 'user')
-      .where('subscription.user = :userId', { userId: user.id });
+      .leftJoinAndSelect('subscription.author', 'author')
+      .where('subscription.subscriber = :subscriberId', {
+        subscriberId: user.id,
+      });
 
     if (search) {
-      queryBuilder.andWhere('category.name ILIKE :search', {
+      queryBuilder.andWhere('author.username ILIKE :search', {
         search: `%${search}%`,
       });
     }
@@ -74,8 +75,8 @@ export class SubscriptionsRepository {
 
   async remove(id: string, user: any): Promise<DeleteResult> {
     return await this.subscriptionsRepository.delete({
-      category: { id },
-      user: { id: user.id },
+      author: { id },
+      subscriber: { id: user.id },
     });
   }
 }

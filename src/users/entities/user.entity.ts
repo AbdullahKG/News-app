@@ -18,8 +18,11 @@ export class Users extends CoreEntity {
   @Column({ type: 'varchar', nullable: false })
   role: string;
 
-  @OneToMany(() => Subscriptions, (subscription) => subscription.user)
-  subscriptions: Subscriptions[];
+  @OneToMany(() => Subscriptions, (subscription) => subscription.subscriber)
+  followedAuthors: Subscriptions[]; // authors this user follows
+
+  @OneToMany(() => Subscriptions, (sub) => sub.author)
+  followers: Subscriptions[]; // users following this user
 
   @OneToMany(() => Newsletters, (newsletter) => newsletter.author)
   newsletters: Newsletters[];
