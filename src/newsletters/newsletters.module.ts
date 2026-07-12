@@ -7,10 +7,12 @@ import { Users } from 'src/users/entities/user.entity';
 import { Categories } from 'src/categories/entities/category.entity';
 import { NewslettersRepository } from './newsletters.repository';
 import { RedisModule } from 'src/redis/redis.module';
+import { BullModule } from '@nestjs/bullmq';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Newsletters, Users, Categories]),
+    BullModule.registerQueue({ name: 'notifications' }),
     RedisModule,
   ],
   controllers: [NewslettersController],

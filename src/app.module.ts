@@ -12,6 +12,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { CategoriesModule } from './categories/categories.module';
 import { NewslettersModule } from './newsletters/newsletters.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { BullModule } from '@nestjs/bullmq';
 
 @Module({
   imports: [
@@ -19,6 +20,15 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module';
       isGlobal: true,
     }),
     TypeOrmModule.forRootAsync(typeOrmConfigAsync),
+    BullModule.forRoot({
+      connection: {
+        host: process.env.REDIS_HOST,
+        port: Number(process.env.REDIS_PORT),
+      },
+      defaultJobOptions: {
+        attempts: 3,
+      },
+    }),
     RedisModule,
     AuthModule,
     UsersModule,

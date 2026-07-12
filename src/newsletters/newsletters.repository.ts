@@ -12,12 +12,15 @@ import { UpdateNewsletterDto } from './dto/update-newsletter.dto';
 import { RedisService } from 'src/redis/redis.service';
 import { Categories } from 'src/categories/entities/category.entity';
 import { Users } from 'src/users/entities/user.entity';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class NewslettersRepository {
   constructor(
     @InjectRepository(Newsletters)
     private readonly newslettersRepository: Repository<Newsletters>,
+    @InjectQueue('notifications') private readonly notificationsQueue: Queue,
     private readonly redisService: RedisService,
   ) {}
 
@@ -49,6 +52,10 @@ export class NewslettersRepository {
     }
 
     await this.invalidateNewslettersCache();
+    await this.notificationsQueue.add('newsletter-published', {
+      newsletterId: savedNewsletter.id,
+      authorId: user.id,
+    });
     return savedNewsletter;
   }
 
