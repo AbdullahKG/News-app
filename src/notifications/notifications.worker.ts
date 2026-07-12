@@ -40,6 +40,7 @@ export class NotificationsProcessor extends WorkerHost {
       .insert()
       .into(Notifications)
       .values(values)
+      .orIgnore()
       .execute();
   }
 }
