@@ -9,6 +9,7 @@ import { Bcrypt } from 'src/common/classes/bcrypt.class';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './strategies/local.startegy';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   imports: [
@@ -25,6 +26,6 @@ import { LocalStrategy } from './strategies/local.startegy';
     PassportModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, AuthRepository, Bcrypt, LocalStrategy],
+  providers: [AuthService, AuthRepository, Bcrypt, LocalStrategy, JwtStrategy],
 })
 export class AuthModule {}
