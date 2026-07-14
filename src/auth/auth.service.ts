@@ -1,12 +1,7 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthRepository } from './auth.repository';
 import { JwtService } from '@nestjs/jwt';
 import { Bcrypt } from 'src/common/classes/bcrypt.class';
-import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -16,19 +11,21 @@ export class AuthService {
     private readonly bcrypt: Bcrypt,
   ) {}
 
-  async login(loginDto: LoginDto): Promise<any> {
-    const user = await this.authRepository.getUserByEmail(loginDto.email);
+  async validateUser(email: string, password: string): Promise<any> {
+    const user = await this.authRepository.getUserByEmail(email);
 
     if (!user) {
-      throw new NotFoundException();
+      throw new UnauthorizedException('Invalid email or password');
     }
 
-    if (
-      !(await this.bcrypt.isValidPassword(loginDto.password, user.password))
-    ) {
-      throw new UnauthorizedException('email or password is incorrect');
+    if (!(await this.bcrypt.isValidPassword(password, user.password))) {
+      throw new UnauthorizedException('Invalid email or password');
     }
 
+    return user;
+  }
+
+  async login(user: any): Promise<any> {
     const { id, role, email } = user;
 
     const payload: any = {

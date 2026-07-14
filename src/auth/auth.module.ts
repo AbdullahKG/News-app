@@ -7,6 +7,8 @@ import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
 import { AuthRepository } from './auth.repository';
 import { Bcrypt } from 'src/common/classes/bcrypt.class';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { PassportModule } from '@nestjs/passport';
+import { LocalStrategy } from './strategies/local.startegy';
 
 @Module({
   imports: [
@@ -20,8 +22,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         signOptions: { expiresIn: config.get<string>('JWT_EXPIRATION') as any },
       }),
     }),
+    PassportModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, AuthRepository, Bcrypt],
+  providers: [AuthService, AuthRepository, Bcrypt, LocalStrategy],
 })
 export class AuthModule {}
