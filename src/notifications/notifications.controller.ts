@@ -4,6 +4,7 @@ import { Roles } from 'src/auth/decorators/role.decorator';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
 import { RolesGuard } from 'src/auth/guard/roles.guard';
 import { UserRoleEnum } from 'src/users/enums/user-roles.enum';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 
 @Controller('notifications')
 @UseGuards(JwtGuard, RolesGuard)
@@ -12,12 +13,12 @@ export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
   @Get()
-  findAll(@Req() req) {
-    return this.notificationsService.findAll(req.user);
+  findAll(@CurrentUser() user: any) {
+    return this.notificationsService.findAll(user);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Req() req) {
-    return this.notificationsService.update(id, req.user);
+  update(@Param('id') id: string, @CurrentUser() user: any) {
+    return this.notificationsService.update(id, user);
   }
 }

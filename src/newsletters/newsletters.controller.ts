@@ -18,6 +18,7 @@ import { Roles } from 'src/auth/decorators/role.decorator';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
 import { RolesGuard } from 'src/auth/guard/roles.guard';
 import { UserRoleEnum } from 'src/users/enums/user-roles.enum';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 
 @Controller('newsletters')
 @UseGuards(JwtGuard, RolesGuard)
@@ -26,12 +27,15 @@ export class NewslettersController {
   constructor(private readonly newslettersService: NewslettersService) {}
 
   @Post()
-  create(@Body() createNewsletterDto: CreateNewsletterDto, @Req() req: any) {
-    return this.newslettersService.create(createNewsletterDto, req.user);
+  create(
+    @Body() createNewsletterDto: CreateNewsletterDto,
+    @CurrentUser() user: any,
+  ) {
+    return this.newslettersService.create(createNewsletterDto, user);
   }
 
   @Get()
-  @Roles(UserRoleEnum.USER)
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.AUTHOR, UserRoleEnum.USER)
   findAll(@Query() query: GetNewsletterDto) {
     return this.newslettersService.findAll(query);
   }
