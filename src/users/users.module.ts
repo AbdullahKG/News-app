@@ -10,5 +10,6 @@ import { Bcrypt } from 'src/common/classes/bcrypt.class';
   imports: [TypeOrmModule.forFeature([Users])],
   controllers: [UsersController],
   providers: [UsersService, UsersRepository, Bcrypt],
+  exports: [UsersService],
 })
 export class UsersModule {}

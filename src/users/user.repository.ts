@@ -9,7 +9,13 @@ import { Users } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { GetUsersDto } from './dto/get-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { DeleteResult, ILike, Repository } from 'typeorm';
+import {
+  DeleteResult,
+  ILike,
+  MoreThan,
+  Repository,
+  UpdateResult,
+} from 'typeorm';
 import { Bcrypt } from 'src/common/classes/bcrypt.class';
 
 @Injectable()
@@ -61,13 +67,35 @@ export class UsersRepository {
     return foundUser;
   }
 
+  async getUserByEmail(email: string): Promise<Users | null> {
+    return await this.userRepository
+      .createQueryBuilder('user')
+      .addSelect('user.password')
+      .where('user.email = :email', { email })
+      .getOne();
+  }
+
+  async findUserByEmail(email: string): Promise<Users | null> {
+    return await this.userRepository.findOne({
+      where: { email },
+    });
+  }
+
+  async findUserByResetToken(token: string): Promise<Users | null> {
+    return await this.userRepository.findOne({
+      where: {
+        resetToken: token,
+        resetTokenExpiry: MoreThan(new Date()),
+      },
+    });
+  }
+
   async update(id: string, updateUserDto: UpdateUserDto): Promise<Users> {
     const foundUser = await this.findOne(id, {});
 
-    const { username, password, role, email } = updateUserDto;
+    const { username, role, email } = updateUserDto;
 
     foundUser.username = username ?? foundUser.username;
-    foundUser.password = password ?? foundUser.password;
     foundUser.role = role ?? foundUser.role;
     foundUser.email = email ?? foundUser.email;
 
@@ -79,6 +107,15 @@ export class UsersRepository {
       }
       throw new InternalServerErrorException(error.message);
     }
+  }
+
+  async updateAuthFields(
+    id: string,
+    fields: Partial<
+      Pick<Users, 'password' | 'resetToken' | 'resetTokenExpiry'>
+    >,
+  ): Promise<UpdateResult> {
+    return await this.userRepository.update(id, fields);
   }
 
   async remove(id: string): Promise<DeleteResult> {

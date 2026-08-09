@@ -4,7 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { GetUsersDto } from './dto/get-user.dto';
 import { UsersRepository } from './user.repository';
 import { Users } from './entities/user.entity';
-import { DeleteResult } from 'typeorm';
+import { DeleteResult, UpdateResult } from 'typeorm';
 
 @Injectable()
 export class UsersService {
@@ -22,8 +22,29 @@ export class UsersService {
     return this.usersRepository.findOne(id, query);
   }
 
+  getUserByEmail(email: string): Promise<Users | null> {
+    return this.usersRepository.getUserByEmail(email);
+  }
+
+  findUserByEmail(email: string): Promise<Users | null> {
+    return this.usersRepository.findUserByEmail(email);
+  }
+
+  findUserByResetToken(token: string): Promise<Users | null> {
+    return this.usersRepository.findUserByResetToken(token);
+  }
+
   update(id: string, updateUserDto: UpdateUserDto): Promise<Users> {
     return this.usersRepository.update(id, updateUserDto);
+  }
+
+  updateAuthFields(
+    id: string,
+    fields: Partial<
+      Pick<Users, 'password' | 'resetToken' | 'resetTokenExpiry'>
+    >,
+  ): Promise<UpdateResult> {
+    return this.usersRepository.updateAuthFields(id, fields);
   }
 
   remove(id: string): Promise<DeleteResult> {

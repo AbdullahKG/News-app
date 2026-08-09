@@ -18,6 +18,12 @@ export class Users extends CoreEntity {
   @Column({ type: 'varchar', nullable: false })
   role: string;
 
+  @Column({ type: 'varchar', nullable: true })
+  resetToken: string | null;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  resetTokenExpiry: Date | null;
+
   @OneToMany(() => Subscriptions, (subscription) => subscription.subscriber)
   followedAuthors: Subscriptions[]; // authors this user follows
 

@@ -13,6 +13,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { NewslettersModule } from './newsletters/newsletters.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { BullModule } from '@nestjs/bullmq';
+import { EmailsModule } from './emails/emails.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { BullModule } from '@nestjs/bullmq';
     CategoriesModule,
     NewslettersModule,
     SubscriptionsModule,
+    EmailsModule,
   ],
   controllers: [AppController],
   providers: [AppService, Logger],
