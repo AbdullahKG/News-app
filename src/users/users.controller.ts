@@ -20,6 +20,8 @@ import { JwtGuard } from 'src/auth/guard/jwt.guard';
 import { RolesGuard } from 'src/auth/guard/roles.guard';
 import { Roles } from 'src/auth/decorators/role.decorator';
 import { UserRoleEnum } from './enums/user-roles.enum';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('users')
 @UseGuards(JwtGuard, RolesGuard)
@@ -37,6 +39,12 @@ export class UsersController {
     @Query() query: GetUsersDto,
   ): Promise<{ users: Users[]; total: number }> {
     return this.usersService.findAll(query);
+  }
+
+  @Public()
+  @Get('me')
+  findMe(@CurrentUser() user): Promise<Users> {
+    return this.usersService.findMe(user);
   }
 
   @Get(':id')

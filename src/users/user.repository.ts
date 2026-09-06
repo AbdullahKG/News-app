@@ -81,6 +81,16 @@ export class UsersRepository {
     });
   }
 
+  async findMe(user): Promise<Users> {
+    const foundUser = await this.userRepository.findOne({
+      where: { id: user.id },
+    });
+
+    if (!foundUser) throw new NotFoundException('no user found');
+
+    return foundUser;
+  }
+
   async findUserByResetToken(token: string): Promise<Users | null> {
     return await this.userRepository.findOne({
       where: {

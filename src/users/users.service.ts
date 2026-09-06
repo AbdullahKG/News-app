@@ -22,6 +22,10 @@ export class UsersService {
     return this.usersRepository.findOne(id, query);
   }
 
+  findMe(user): Promise<Users> {
+    return this.usersRepository.findMe(user);
+  }
+
   getUserByEmail(email: string): Promise<Users | null> {
     return this.usersRepository.getUserByEmail(email);
   }
