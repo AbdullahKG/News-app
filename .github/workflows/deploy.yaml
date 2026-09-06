@@ -35,24 +35,10 @@ jobs:
   deploy:
     name: Deploy to VPS
     runs-on: ubuntu-24.04
-    enviroment: production
+    environment: production
     needs: test
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24.15.0'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build Application
-        run: npm run build
-
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1
         with:
@@ -61,7 +47,7 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
 
           script: |
-            cd ${{ VPS_APP_DIR }}
+            cd "${{ secrets.VPS_APP_DIR }}"
 
             echo "Pulling latest changes"
             git pull
@@ -73,6 +59,6 @@ jobs:
             npm run build
 
             echo "Restarting application"
-            pm2 restart your-app-name
+            pm2 restart 0
 
             echo "Deployment completed successfully."
