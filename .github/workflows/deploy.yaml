@@ -47,7 +47,7 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
 
           script: |
-            pwd
+            whoami
             cd "${{ secrets.VPS_APP_DIR }}"
 
             echo "Pulling latest changes"
