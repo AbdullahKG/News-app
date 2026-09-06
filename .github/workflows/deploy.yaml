@@ -47,9 +47,11 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
 
           script: |
-            whoami
+            echo "loading nvm"
+            source ~/.nvm/nvm.sh
+
             cd "${{ secrets.VPS_APP_DIR }}"
-            ls -la
+
             echo "Pulling latest changes"
             git pull
 
